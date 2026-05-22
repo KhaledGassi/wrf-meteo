@@ -1,0 +1,307 @@
+{
+  "date": "20260522",
+  "cycle": "00",
+  "generated": "2026-05-22T20:39:10.037067",
+  "plots": [
+    {
+      "file": "prec_F000.png",
+      "title": "Précip +000h"
+    },
+    {
+      "file": "wind_F000.png",
+      "title": "Vent +000h"
+    },
+    {
+      "file": "mslp_F000.png",
+      "title": "MSLP+Z500 +000h"
+    },
+    {
+      "file": "prec_F001.png",
+      "title": "Précip +001h"
+    },
+    {
+      "file": "wind_F001.png",
+      "title": "Vent +001h"
+    },
+    {
+      "file": "mslp_F001.png",
+      "title": "MSLP+Z500 +001h"
+    },
+    {
+      "file": "prec_F002.png",
+      "title": "Précip +002h"
+    },
+    {
+      "file": "wind_F002.png",
+      "title": "Vent +002h"
+    },
+    {
+      "file": "mslp_F002.png",
+      "title": "MSLP+Z500 +002h"
+    },
+    {
+      "file": "prec_F003.png",
+      "title": "Précip +003h"
+    },
+    {
+      "file": "wind_F003.png",
+      "title": "Vent +003h"
+    },
+    {
+      "file": "mslp_F003.png",
+      "title": "MSLP+Z500 +003h"
+    },
+    {
+      "file": "prec_F004.png",
+      "title": "Précip +004h"
+    },
+    {
+      "file": "wind_F004.png",
+      "title": "Vent +004h"
+    },
+    {
+      "file": "mslp_F004.png",
+      "title": "MSLP+Z500 +004h"
+    },
+    {
+      "file": "prec_F005.png",
+      "title": "Précip +005h"
+    },
+    {
+      "file": "wind_F005.png",
+      "title": "Vent +005h"
+    },
+    {
+      "file": "mslp_F005.png",
+      "title": "MSLP+Z500 +005h"
+    },
+    {
+      "file": "prec_F006.png",
+      "title": "Précip +006h"
+    },
+    {
+      "file": "wind_F006.png",
+      "title": "Vent +006h"
+    },
+    {
+      "file": "mslp_F006.png",
+      "title": "MSLP+Z500 +006h"
+    },
+    {
+      "file": "prec_F007.png",
+      "title": "Précip +007h"
+    },
+    {
+      "file": "wind_F007.png",
+      "title": "Vent +007h"
+    },
+    {
+      "file": "mslp_F007.png",
+      "title": "MSLP+Z500 +007h"
+    },
+    {
+      "file": "prec_F008.png",
+      "title": "Précip +008h"
+    },
+    {
+      "file": "wind_F008.png",
+      "title": "Vent +008h"
+    },
+    {
+      "file": "mslp_F008.png",
+      "title": "MSLP+Z500 +008h"
+    },
+    {
+      "file": "prec_F009.png",
+      "title": "Précip +009h"
+    },
+    {
+      "file": "wind_F009.png",
+      "title": "Vent +009h"
+    },
+    {
+      "file": "mslp_F009.png",
+      "title": "MSLP+Z500 +009h"
+    },
+    {
+      "file": "prec_F010.png",
+      "title": "Précip +010h"
+    },
+    {
+      "file": "wind_F010.png",
+      "title": "Vent +010h"
+    },
+    {
+      "file": "mslp_F010.png",
+      "title": "MSLP+Z500 +010h"
+    },
+    {
+      "file": "prec_F011.png",
+      "title": "Précip +011h"
+    },
+    {
+      "file": "wind_F011.png",
+      "title": "Vent +011h"
+    },
+    {
+      "file": "mslp_F011.png",
+      "title": "MSLP+Z500 +011h"
+    },
+    {
+      "file": "prec_F012.png",
+      "title": "Précip +012h"
+    },
+    {
+      "file": "wind_F012.png",
+      "title": "Vent +012h"
+    },
+    {
+      "file": "mslp_F012.png",
+      "title": "MSLP+Z500 +012h"
+    },
+    {
+      "file": "prec_F013.png",
+      "title": "Précip +013h"
+    },
+    {
+      "file": "wind_F013.png",
+      "title": "Vent +013h"
+    },
+    {
+      "file": "mslp_F013.png",
+      "title": "MSLP+Z500 +013h"
+    },
+    {
+      "file": "prec_F014.png",
+      "title": "Précip +014h"
+    },
+    {
+      "file": "wind_F014.png",
+      "title": "Vent +014h"
+    },
+    {
+      "file": "mslp_F014.png",
+      "title": "MSLP+Z500 +014h"
+    },
+    {
+      "file": "prec_F015.png",
+      "title": "Précip +015h"
+    },
+    {
+      "file": "wind_F015.png",
+      "title": "Vent +015h"
+    },
+    {
+      "file": "mslp_F015.png",
+      "title": "MSLP+Z500 +015h"
+    },
+    {
+      "file": "prec_F016.png",
+      "title": "Précip +016h"
+    },
+    {
+      "file": "wind_F016.png",
+      "title": "Vent +016h"
+    },
+    {
+      "file": "mslp_F016.png",
+      "title": "MSLP+Z500 +016h"
+    },
+    {
+      "file": "prec_F017.png",
+      "title": "Précip +017h"
+    },
+    {
+      "file": "wind_F017.png",
+      "title": "Vent +017h"
+    },
+    {
+      "file": "mslp_F017.png",
+      "title": "MSLP+Z500 +017h"
+    },
+    {
+      "file": "prec_F018.png",
+      "title": "Précip +018h"
+    },
+    {
+      "file": "wind_F018.png",
+      "title": "Vent +018h"
+    },
+    {
+      "file": "mslp_F018.png",
+      "title": "MSLP+Z500 +018h"
+    },
+    {
+      "file": "prec_F019.png",
+      "title": "Précip +019h"
+    },
+    {
+      "file": "wind_F019.png",
+      "title": "Vent +019h"
+    },
+    {
+      "file": "mslp_F019.png",
+      "title": "MSLP+Z500 +019h"
+    },
+    {
+      "file": "prec_F020.png",
+      "title": "Précip +020h"
+    },
+    {
+      "file": "wind_F020.png",
+      "title": "Vent +020h"
+    },
+    {
+      "file": "mslp_F020.png",
+      "title": "MSLP+Z500 +020h"
+    },
+    {
+      "file": "prec_F021.png",
+      "title": "Précip +021h"
+    },
+    {
+      "file": "wind_F021.png",
+      "title": "Vent +021h"
+    },
+    {
+      "file": "mslp_F021.png",
+      "title": "MSLP+Z500 +021h"
+    },
+    {
+      "file": "prec_F022.png",
+      "title": "Précip +022h"
+    },
+    {
+      "file": "wind_F022.png",
+      "title": "Vent +022h"
+    },
+    {
+      "file": "mslp_F022.png",
+      "title": "MSLP+Z500 +022h"
+    },
+    {
+      "file": "prec_F023.png",
+      "title": "Précip +023h"
+    },
+    {
+      "file": "wind_F023.png",
+      "title": "Vent +023h"
+    },
+    {
+      "file": "mslp_F023.png",
+      "title": "MSLP+Z500 +023h"
+    },
+    {
+      "file": "prec_F000.png",
+      "title": "Précip +000h"
+    },
+    {
+      "file": "wind_F000.png",
+      "title": "Vent +000h"
+    },
+    {
+      "file": "mslp_F000.png",
+      "title": "MSLP+Z500 +000h"
+    }
+  ]
+}
