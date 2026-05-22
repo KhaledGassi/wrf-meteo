@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WRF Dashboard — Météo Algérie</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: sans-serif; background: #0f1117; color: #e0e0e0; min-height: 100vh; }
+header { background: #1a1d27; border-bottom: 1px solid #2d3148; padding: 12px 20px; }
+header h1 { font-size: 1.2rem; color: #7eb3f5; }
+header .sub { font-size: 0.8rem; color: #888; }
+.controls { background: #1a1d27; padding: 12px 20px; border-bottom: 1px solid #2d3148; display: flex; flex-wrap: wrap; gap: 12px; }
+.ctrl-group { display: flex; flex-direction: column; gap: 4px; }
+.ctrl-group label { font-size: 0.7rem; color: #888; text-transform: uppercase; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 6px; }
+button { background: #2a2d3e; border: 1px solid #3d4166; color: #ccc; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; }
+button.active { background: #2a5bd7; border-color: #4a7bf7; color: #fff; }
+select { background: #2a2d3e; border: 1px solid #3d4166; color: #ccc; padding: 6px 10px; border-radius: 6px; font-size: 0.82rem; }
+.map-container { padding: 16px; display: flex; justify-content: center; }
+.map-container img { max-width: 100%; border-radius: 8px; border: 1px solid #2d3148; }
+.map-placeholder { width: 100%; max-width: 900px; height: 400px; background: #1a1d27; border-radius: 8px; border: 1px solid #2d3148; display: flex; align-items: center; justify-content: center; color: #555; }
+.status { padding: 8px 20px; font-size: 0.75rem; color: #666; background: #13151f; border-top: 1px solid #2d3148; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🌦 WRF Dashboard — Météo Algérie / Maghreb</h1>
+  <div class="sub">WRF 4.6.1 · 15 km · GFS 0.25°</div>
+</header>
+<div class="controls">
+  <div class="ctrl-group">
+    <label>Variable</label>
+    <div class="btn-row">
+      <button onclick="setVar('prec',this)">Précip</button>
+      <button class="active" onclick="setVar('wind',this)">Vent 10m</button>
+      <button onclick="setVar('mslp',this)">MSLP+Z500</button>
+    </div>
+  </div>
+  <div class="ctrl-group">
+    <label>Échéance</label>
+    <div class="btn-row" id="fh-buttons"></div>
+  </div>
+</div>
+<div class="map-container">
+  <img id="map-img" src="" alt="Carte WRF"
+       onerror="this.style.display='none';document.getElementById('map-err').style.display='flex'"
+       onload="this.style.display='block';document.getElementById('map-err').style.display='none'">
+  <div id="map-err" class="map-placeholder">Carte non disponible</div>
+</div>
+<div class="status" id="status-bar">—</div>
+<script>
+let curVar = 'wind', curFH = 'F000';
+const RUN = '20260522_00Z';
+function setVar(v, btn) {
+  curVar = v;
+  document.querySelectorAll('.btn-row button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateMap();
+}
+function setFH(fh, btn) {
+  curFH = fh;
+  document.querySelectorAll('#fh-buttons button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateMap();
+}
+function updateMap() {
+  const p = `plots/${RUN}/${curVar}_${curFH}.png`;
+  document.getElementById('map-img').src = p;
+  document.getElementById('status-bar').textContent = `Run: ${RUN} | ${curVar.toUpperCase()} | ${curFH}`;
+}
+const container = document.getElementById('fh-buttons');
+for (let h = 0; h <= 23; h++) {
+  const fh = 'F' + String(h).padStart(3,'0');
+  const btn = document.createElement('button');
+  btn.textContent = '+' + String(h).padStart(2,'0') + 'h';
+  if (fh === curFH) btn.classList.add('active');
+  btn.onclick = () => setFH(fh, btn);
+  container.appendChild(btn);
+}
+updateMap();
+</script>
+</body>
+</html>
