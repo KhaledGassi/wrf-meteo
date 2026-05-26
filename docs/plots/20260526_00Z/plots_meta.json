@@ -1,8 +1,23 @@
 {
   "date": "20260526",
   "cycle": "00",
-  "generated": "2026-05-26T11:38:19.008706",
+  "generated": "2026-05-26T20:31:06.433438",
   "plots": [
+    {
+      "file": "t2m_F000.png",
+      "title": "T2m +000h",
+      "category": "meteo"
+    },
+    {
+      "file": "prec_F000.png",
+      "title": "Précip +000h",
+      "category": "meteo"
+    },
+    {
+      "file": "wind_F000.png",
+      "title": "Vent +000h",
+      "category": "meteo"
+    },
     {
       "file": "rh_F000.png",
       "title": "HR +000h",
