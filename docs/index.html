@@ -1,444 +1,119 @@
-bash
-
-python3 << 'PYEOF'
-logo_uri = open('/home/claude/logo_uri.txt').read()
-
-# Build complete self-contained dashboard
-html = '''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ForestPyroGuard AI — Algérie</title>
-<style>
-:root{
-  --bg:#080c08;--bg2:#0e140e;--bg3:#161e16;--bg4:#1c261c;
-  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);
-  --text:#cce0cc;--muted:#4a6a4a;--muted2:#6a8a6a;
-  --orange:#e06a18;--orange2:rgba(224,106,24,0.18);
-  --green:#2a6a35;--red:#dc2828;--red2:rgba(220,40,40,0.12);
-  --yellow:#dca010;--yellow2:rgba(220,160,16,0.12);--cyan:#40c8c8;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);}
-
-#splash{
-  position:fixed;inset:0;z-index:9999;
-  background:radial-gradient(ellipse at 50% 38%,#0c1a0c 0%,#050805 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:24px 20px;overflow-y:auto;transition:opacity 0.7s ease;
-  cursor:default;
-}
-#splash.out{opacity:0;pointer-events:none;}
-.sp-logo{width:130px;height:130px;object-fit:contain;animation:breathe 3s ease-in-out infinite;}
-@keyframes breathe{0%,100%{transform:scale(1);filter:drop-shadow(0 0 18px rgba(224,106,24,0.4))}50%{transform:scale(1.05);filter:drop-shadow(0 0 36px rgba(224,106,24,0.75))}}
-.sp-brand{margin-top:18px;text-align:center;}
-.sp-brand h1{font-size:2rem;font-weight:800;color:#fff;letter-spacing:3px;}
-.sp-brand h2{font-size:0.78rem;color:var(--orange);letter-spacing:4px;text-transform:uppercase;margin-top:6px;}
-.sp-divider{width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--orange),transparent);margin:18px auto;}
-.sp-desc{max-width:560px;text-align:center;font-size:0.82rem;color:#6a8a6a;line-height:1.75;}
-.sp-desc b{color:#8aaa8a;}
-.sp-feats{display:flex;gap:20px;margin-top:22px;flex-wrap:wrap;justify-content:center;}
-.sf{text-align:center;min-width:96px;}
-.sf-icon{font-size:1.4rem;display:block;margin-bottom:5px;}
-.sf-val{font-size:0.78rem;font-weight:700;color:#fff;display:block;}
-.sf-lbl{font-size:0.64rem;color:var(--muted);margin-top:2px;line-height:1.4;}
-.sp-cards{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-width:480px;width:100%;margin-top:18px;}
-.spc{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:9px 12px;}
-.spc-lbl{font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
-.spc-val{font-size:0.82rem;font-weight:600;color:#bdd8bd;margin-top:2px;}
-.sp-run-info{margin-top:16px;font-size:0.7rem;color:var(--muted2);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;padding:6px 14px;text-align:center;}
-.sp-run-info b{color:var(--orange);}
-.sp-enter{
-  margin-top:22px;background:var(--orange);color:#fff;
-  border:none;border-radius:8px;padding:12px 48px;
-  font-size:0.88rem;font-weight:800;letter-spacing:2px;
-  text-transform:uppercase;cursor:pointer;
-  transition:transform 0.15s,filter 0.15s;
-  position:relative;z-index:1;
-}
-.sp-enter:hover{transform:translateY(-2px);filter:brightness(1.15);}
-.sp-ver{margin-top:14px;font-size:0.6rem;color:var(--muted);}
-
-#app{display:none;height:100%;flex-direction:column;}
-
-header{
-  height:50px;min-height:50px;background:var(--bg2);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 14px;gap:10px;z-index:300;flex-shrink:0;
-}
-.hbrand{display:flex;align-items:center;gap:9px;}
-.hlogo{width:28px;height:28px;object-fit:contain;}
-.htitle{font-size:0.9rem;font-weight:700;color:#fff;}
-.hsub{font-size:0.6rem;color:var(--muted);}
-.hmeta{display:flex;gap:6px;align-items:center;flex-shrink:0;}
-.hbadge{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 9px;font-size:0.66rem;white-space:nowrap;}
-.hbadge b{color:var(--orange);}
-.hbadge.rE{border-color:rgba(220,40,40,0.45);background:var(--red2);}
-.hbadge.rE b{color:#ff5858;animation:ablnk 1.3s ease infinite;}
-.hbadge.rH b{color:#ffcc30;}
-.hbadge.rM b{color:#ffe060;}
-.hbadge.rL b{color:#50cc50;}
-@keyframes ablnk{0%,100%{opacity:1}50%{opacity:0.3}}
-.run-sel{font-size:0.64rem;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:5px;padding:3px 7px;cursor:pointer;outline:none;}
-
-.body{display:flex;flex:1;overflow:hidden;min-height:0;}
-
-.sidebar{width:238px;min-width:238px;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
-.sb-sec{padding:9px 11px;border-bottom:1px solid var(--border);}
-.sblbl{font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:7px;}
-.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
-.pbtn{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:6px 4px 5px;font-size:0.66rem;color:var(--text);cursor:pointer;text-align:center;transition:all 0.15s;line-height:1.3;}
-.pbtn:hover{border-color:var(--border2);}
-.pbtn.on{border-color:var(--orange);background:var(--orange2);color:#fff;}
-.pi{font-size:1rem;display:block;margin-bottom:2px;}
-.frow{margin-bottom:7px;}
-.frt{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1px;}
-.fn{font-size:0.66rem;font-weight:700;color:#fff;}
-.fv{font-size:0.72rem;font-weight:700;}
-.fd{font-size:0.58rem;color:var(--muted);margin-bottom:2px;}
-.fb{height:3px;background:rgba(255,255,255,0.05);border-radius:2px;}
-.ff{height:100%;border-radius:2px;transition:width 0.5s;}
-.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
-.scard{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:6px 8px;}
-.slbl{font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;}
-.sval{font-size:1.05rem;font-weight:700;margin-top:1px;line-height:1;}
-.sunit{font-size:0.58rem;color:var(--muted);font-weight:400;}
-.rcard{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 9px;margin-bottom:4px;cursor:pointer;transition:border-color 0.15s;}
-.rcard:hover{border-color:var(--border2);}
-.rct{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
-.rcn{font-size:0.72rem;font-weight:600;}
-.rpill{padding:1px 7px;border-radius:20px;font-size:0.6rem;font-weight:700;}
-.rpill.rE{background:var(--red2);color:#ff5858;border:1px solid rgba(220,40,40,0.35);}
-.rpill.rH{background:var(--yellow2);color:#ffcc30;border:1px solid rgba(220,160,16,0.3);}
-.rpill.rM{background:rgba(200,190,0,0.12);color:#ffe060;border:1px solid rgba(200,190,0,0.28);}
-.rpill.rL{background:rgba(40,180,40,0.1);color:#50cc50;border:1px solid rgba(40,180,40,0.3);}
-.rbg{height:3px;background:rgba(255,255,255,0.05);border-radius:2px;margin-bottom:3px;}
-.rbar{height:100%;border-radius:2px;}
-.rval{font-size:0.63rem;color:var(--muted);}
-
-.maparea{flex:1;display:flex;flex-direction:column;position:relative;overflow:hidden;min-width:0;}
-.img-wrap{flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg);position:relative;overflow:hidden;}
-#wrf-img{max-width:100%;max-height:100%;object-fit:contain;display:none;transition:opacity 0.2s;}
-#wrf-img.ready{display:block;}
-.mtitle{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;background:rgba(8,12,8,0.92);backdrop-filter:blur(6px);border:1px solid var(--border);border-radius:6px;padding:4px 14px;font-size:0.76rem;font-weight:600;pointer-events:none;white-space:nowrap;color:var(--orange);}
-.minfo{position:absolute;top:8px;right:9px;z-index:10;background:rgba(8,12,8,0.9);backdrop-filter:blur(6px);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:0.61rem;color:var(--muted2);pointer-events:none;line-height:1.7;}
-.minfo b{color:var(--text);}
-.img-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:var(--muted);font-size:0.76rem;position:absolute;inset:0;}
-.spin{font-size:1.6rem;animation:spin 1.2s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.legend{position:absolute;bottom:9px;right:8px;z-index:10;background:rgba(8,12,8,0.93);border:1px solid var(--border);border-radius:7px;padding:8px 11px;min-width:118px;}
-.legend h4{font-size:0.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
-.li{display:flex;align-items:center;gap:5px;margin-bottom:3px;font-size:0.63rem;}
-.lsw{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
-
-.bottom{height:46px;min-height:46px;flex-shrink:0;background:var(--bg2);border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 12px;}
-.play-btn{background:var(--orange2);border:1px solid var(--orange);border-radius:6px;padding:5px 13px;color:var(--orange);font-size:0.72rem;cursor:pointer;font-weight:700;transition:background 0.18s;white-space:nowrap;min-width:82px;}
-.play-btn:hover{background:rgba(224,106,24,0.3);}
-.sw{flex:1;display:flex;align-items:center;gap:8px;}
-#fh-slider{flex:1;accent-color:var(--orange);}
-#fh-label{font-size:0.72rem;font-weight:700;color:var(--orange);min-width:42px;}
-.fchips{display:flex;gap:8px;flex-wrap:wrap;}
-.fchip{font-size:0.62rem;}
-.fchip span{color:var(--muted);}
-.fchip b{color:var(--cyan);}
-::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border2);}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pyroguard AI - Dashboard</title>
+    <!-- استدعاء مكتبات الخرائط والتنسيقات -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        /* تنسيقات شاشة الترحيب Splash Screen */
+        #splash {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1e1e2f, #0f0f1a);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .sp-title { font-size: 2.5rem; font-weight: bold; margin-bottom: 20px; letter-spacing: 2px; }
+        .sp-enter {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .sp-enter:hover { background-color: #c0392b; }
+        
+        /* إخفاء محتوى لوحة التحكم الأساسية أثناء شاشة العرض */
+        #main-app { display: block; padding: 20px; color: #333; }
+        .logo-container img { max-width: 150px; height: auto; }
+    </style>
 </head>
 <body>
 
-<div id="splash">
-  <img class="sp-logo" src="__LOGO__" alt="ForestPyroGuard AI">
-  <div class="sp-brand">
-    <h1>ForestPyroGuard AI</h1>
-    <h2>Système de prévision feux · Algérie</h2>
-  </div>
-  <div class="sp-divider"></div>
-  <p class="sp-desc">
-    Plateforme opérationnelle de surveillance et prévision du risque incendie basée sur
-    le modèle <b>WRF-ARW 4.6.1</b> à 15 km, alimentée par <b>GFS 0.25° NCEP</b>.
-    Développée par l'<b>ONM/DMRE Constantine</b> · <b>UC3</b> · <b>GIZ Agritech</b>.
-  </p>
-  <div class="sp-feats">
-    <div class="sf"><span class="sf-icon">🛰️</span><span class="sf-val">WRF 4.6.1</span><span class="sf-lbl">ARW @ 15 km</span></div>
-    <div class="sf"><span class="sf-icon">🔥</span><span class="sf-val">FWI Canadien</span><span class="sf-lbl">FFMC·DMC·DC·ISI</span></div>
-    <div class="sf"><span class="sf-icon">📡</span><span class="sf-val">GFS 0.25°</span><span class="sf-lbl">Run 00Z · 24h</span></div>
-    <div class="sf"><span class="sf-icon">🗺️</span><span class="sf-val">6 paramètres</span><span class="sf-lbl">Animation horaire</span></div>
-  </div>
-  <div class="sp-cards">
-    <div class="spc"><div class="spc-lbl">Porteur</div><div class="spc-val">ONM — DMRE Constantine</div></div>
-    <div class="spc"><div class="spc-lbl">Partenaires</div><div class="spc-val">UC3 · GIZ Agritech</div></div>
-    <div class="spc"><div class="spc-lbl">Modèle NWP</div><div class="spc-val">WRF-ARW 4.6.1 · WPS 4.6</div></div>
-    <div class="spc"><div class="spc-lbl">Domaine</div><div class="spc-val">100×80 pts · 15 km</div></div>
-  </div>
-  <div class="sp-run-info">Dernier run : <b>__DATE__</b> · Cycle <b>__CYCLE__z</b></div>
-  <button class="sp-enter" id="enter-btn">ACCÉDER AU TABLEAU DE BORD</button>
-  <div class="sp-ver">v3.1 · ONM/PGAI · khaledgassi.github.io/wrf-meteo</div>
-</div>
-
-<div id="app">
-  <header>
-    <div class="hbrand">
-      <img class="hlogo" src="__LOGO__" alt="logo">
-      <div><div class="htitle">ForestPyroGuard AI</div><div class="hsub">Prévision Feux · Algérie · WRF 4.6.1 @ 15km · GFS 0.25°</div></div>
-    </div>
-    <div class="hmeta">
-      <select class="run-sel" id="run-sel" onchange="switchRun(this.value)"></select>
-      <div class="hbadge" id="fwi-badge">FWI max <b id="fwi-max-val">—</b></div>
-      <div class="hbadge" id="risk-badge">Risque <b id="risk-val">—</b></div>
-    </div>
-  </header>
-  <div class="body">
-    <div class="sidebar">
-      <div class="sb-sec">
-        <div class="sblbl">Paramètre</div>
-        <div class="pgrid">
-          <div class="pbtn on" id="pb-t2m"  onclick="selParam('t2m')" ><span class="pi">🌡</span>Temp. 2m</div>
-          <div class="pbtn"    id="pb-wind" onclick="selParam('wind')"><span class="pi">💨</span>Vent 10m</div>
-          <div class="pbtn"    id="pb-rh"   onclick="selParam('rh')"  ><span class="pi">💧</span>Humidité</div>
-          <div class="pbtn"    id="pb-prec" onclick="selParam('prec')"><span class="pi">🌧</span>Précip.</div>
-          <div class="pbtn"    id="pb-mslp" onclick="selParam('mslp')"><span class="pi">🌀</span>MSLP</div>
-          <div class="pbtn"    id="pb-fwi"  onclick="selParam('fwi')" ><span class="pi">🔥</span>FWI</div>
+    <!-- 1. شاشة الترحيب (Splash Screen) -->
+    <div id="splash">
+        <div class="logo-container">
+            <!-- سيتم استبدال وسم الشعار هنا تلقائياً -->
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔥</text></svg>" alt="Logo">
         </div>
-      </div>
-      <div class="sb-sec">
-        <div class="sblbl">Stats domaine</div>
-        <div class="sgrid">
-          <div class="scard"><div class="slbl">Échéance</div><div class="sval" id="st-fh" style="font-size:0.88rem">+00h</div></div>
-          <div class="scard"><div class="slbl">Variable</div><div class="sval" id="st-par" style="font-size:0.88rem">T2m</div></div>
-        </div>
-      </div>
-      <div class="sb-sec">
-        <div class="sblbl">Indices FWI canadiens</div>
-        <div id="fwi-rows"><div style="font-size:0.63rem;color:var(--muted);padding:5px 0">Chargement...</div></div>
-      </div>
-      <div class="sb-sec">
-        <div class="sblbl">Zones à risque</div>
-        <div id="rcards"><div style="font-size:0.63rem;color:var(--muted);padding:5px 0">Chargement...</div></div>
-      </div>
+        <div class="sp-title">Pyroguard AI</div>
+        <!-- المعرّف هنا يجب أن يكون enter-btn حصراً وبشكل مطابق للجافا سكريبت -->
+        <button class="sp-enter" id="enter-btn">ACCÉDER AU TABLEAU DE BORD</button>
     </div>
-    <div class="maparea">
-      <div class="mtitle" id="mtitle">Initialisation...</div>
-      <div class="minfo" id="minfo">—</div>
-      <div class="img-wrap">
-        <div class="img-ph" id="img-ph"><div class="spin">⟳</div><span>Chargement...</span></div>
-        <img id="wrf-img" alt="Carte WRF" onload="onImgLoad()" onerror="onImgErr()">
-      </div>
-      <div class="legend" id="legend"></div>
+
+    <!-- 2. واجهة تطبيق لوحة التحكم الرئيسية -->
+    <div id="main-app">
+        <h2>Tableau de Bord Synoptique - WRF-ARW</h2>
+        <p>Date du Run: <span id="run-date">20260526</span> (Cycle: <span id="run-cycle">00</span>Z)</p>
+        <div id="map" style="width: 100%; height: 600px; background: #eee; border-radius: 8px;"></div>
     </div>
-  </div>
-  <div class="bottom">
-    <button class="play-btn" id="pbtn" onclick="togglePlay()">▶ Animer</button>
-    <div class="sw">
-      <input type="range" id="fh-slider" min="0" max="23" value="0" step="1" oninput="seekFH(+this.value)">
-      <span id="fh-label">+00h</span>
-    </div>
-    <div class="fchips" id="fchips"></div>
-  </div>
-</div>
 
-<script>
-var RUNS = __RUNS__;
-var curRun   = RUNS.length ? RUNS[0] : "";
-var curParam = "t2m";
-var curFH    = 0;
-var maxFH    = 23;
-var playing  = false;
-var playTimer= null;
+    <!-- استدعاء سكربت الخرائط -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // إدخال المتغيرات القادمة من الباش كود مباشرة بدون علامات اقتباس للمصفوفة[cite: 1]
+        const RUN_DATE = "20260526";
+        const RUN_CYCLE = "00";
+        const AVAILABLE_RUNS = [ "20260526_00Z","20260522_00Z" ]; // سيتم استبدالها بـ [ "20260526_00Z" ] مثلًا[cite: 1]
 
-var PLBL = {t2m:"Température 2m (°C)",wind:"Vent 10m (km/h)",rh:"Humidité (%)",prec:"Précipitations (mm)",mslp:"MSLP + Z500",fwi:"FWI — Risque feux"};
-var PSHT = {t2m:"T2m",wind:"Vent",rh:"HR%",prec:"Précip",mslp:"MSLP",fwi:"FWI"};
-var RLBL = {E:"EXTRÊME",H:"ÉLEVÉ",M:"MODÉRÉ",L:"FAIBLE"};
-var RCOL = {E:"#e84040",H:"#e09000",M:"#cccc00",L:"#40c040"};
-var LEGENDS = {
-  t2m: {t:"Temp. (°C)",    s:[{v:"< 5",c:"#053061"},{v:"10–20",c:"#2166ac"},{v:"25–32",c:"#f7f7f7"},{v:"36–42",c:"#d6604d"},{v:"> 45",c:"#67001f"}]},
-  wind:{t:"Vent (km/h)",   s:[{v:"0–10",c:"#ffffff"},{v:"20–30",c:"#a1dab4"},{v:"40–60",c:"#2c7fb8"},{v:"70–80",c:"#253494"},{v:"> 90",c:"#54278f"}]},
-  rh:  {t:"Humidité (%)",  s:[{v:"0–15%",c:"#a50026"},{v:"25–40%",c:"#fdae61"},{v:"50–65%",c:"#ffffbf"},{v:"70–85%",c:"#a6d96a"},{v:"> 90%",c:"#006837"}]},
-  prec:{t:"Précip. (mm)",  s:[{v:"0",c:"#111811"},{v:"1–5",c:"#1a6e2a"},{v:"5–15",c:"#2060c0"},{v:"15–30",c:"#6820a0"},{v:"> 30",c:"#c000c0"}]},
-  mslp:{t:"MSLP (hPa)",    s:[{v:"< 1008",c:"#1560a0"},{v:"1008–12",c:"#50b0e8"},{v:"1012–16",c:"#f0d060"},{v:"1016–20",c:"#e07030"},{v:"> 1020",c:"#a00020"}]},
-  fwi: {t:"FWI",           s:[{v:"Faible < 5",c:"#1a6e2a"},{v:"Modéré 5–12",c:"#e09000"},{v:"Élevé 12–38",c:"#e05010"},{v:"Extrême > 38",c:"#800000"}]},
-};
-var ZONES = [
-  {n:"Kabylie / Tizi-Ouzou",k:1.00},
-  {n:"Béjaïa / Soummam",   k:0.82},
-  {n:"Skikda / Annaba",    k:0.75},
-  {n:"Blida / Médéa",      k:0.62},
-  {n:"Jijel / Mila",       k:0.55},
-  {n:"Batna / Aurès",      k:0.43},
-];
+        // كود التحكم عند اكتمال واجهة المستخدم واستهداف زر الدخول
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log("[Pyroguard] DOM chargé. Configuration du bouton...");
 
-/* ── SPLASH ── */
-document.getElementById("enter-btn").addEventListener("click", function(){
-  var sp = document.getElementById("splash");
-  sp.classList.add("out");
-  setTimeout(function(){
-    sp.style.display = "none";
-    var app = document.getElementById("app");
-    app.style.display = "flex";
-    initApp();
-  }, 700);
-});
+            const enterBtn = document.getElementById("enter-btn");
+            const splash = document.getElementById("splash");
 
-/* ── INIT ── */
-function initApp(){
-  buildRunSel();
-  loadMeta(curRun);
-}
+            if (enterBtn && splash) {
+                enterBtn.addEventListener("click", function() {
+                    console.log("[Pyroguard] Clic détecté sur le bouton d'accession.");
+                    
+                    // تلاشي تدريجي لشاشة الترحيب
+                    splash.style.opacity = "0";
+                    
+                    setTimeout(function() {
+                        splash.style.display = "none";
+                        
+                        // تشغيل لوحة التحكم والخرائط بأمان دون التأثير على عمل الزر
+                        try {
+                            if (typeof initApp === "function") {
+                                initApp();[cite: 1]
+                            } else {
+                                // تشغيل الدوال الفردية الافتراضية للخرائط إذا لم تكن مجمعة في initApp
+                                initMap();
+                            }
+                        } catch (error) {
+                            console.error("[Pyroguard] Erreur d'initialisation des cartes:", error);
+                        }
+                    }, 500); 
+                });
+            } else {
+                console.error("[Pyroguard Error] Éléments HTML introuvables (#enter-btn ou #splash).");
+            }
+        });
 
-function buildRunSel(){
-  var sel = document.getElementById("run-sel");
-  if(!RUNS.length){ sel.style.display="none"; return; }
-  sel.innerHTML = RUNS.map(function(r){
-    return '<option value="'+r+'" '+(r===curRun?'selected':'')+'>'+fmtRun(r)+'</option>';
-  }).join("");
-}
-
-function fmtRun(r){
-  var m = r.match(/^(\\d{4})(\\d{2})(\\d{2})_(\\d{2}Z)$/);
-  return m ? m[3]+"/"+m[2]+"/"+m[1]+" "+m[4] : r;
-}
-
-function switchRun(run){
-  curRun=run; curFH=0;
-  document.getElementById("fh-slider").value=0;
-  stopPlay(); loadMeta(run);
-}
-
-/* ── META ── */
-function loadMeta(run){
-  if(!run){ renderAll(null); return; }
-  fetch("plots/"+run+"/plots_meta.json?t="+Date.now())
-    .then(function(r){ return r.ok?r.json():null; })
-    .then(function(d){ renderAll(d); })
-    .catch(function(){ renderAll(null); });
-}
-
-function renderAll(d){
-  if(d && d.plots){
-    var fhs = d.plots.map(function(p){ var m=p.file.match(/_F(\\d+)\\.png$/); return m?+m[1]:0; });
-    maxFH = fhs.length ? Math.max.apply(null,fhs) : 23;
-  }
-  document.getElementById("fh-slider").max = maxFH;
-  var fwiMax = d?(d.fwi_max||0):0;
-  var risk   = d?(d.risk_level||"LOW"):"LOW";
-  var rL     = {EXTREME:"E",HIGH:"H",MODERATE:"M",LOW:"L"}[risk]||"L";
-  document.getElementById("fwi-max-val").textContent = fwiMax>0?fwiMax.toFixed(1):"N/D";
-  document.getElementById("risk-val").textContent    = RLBL[rL]||risk;
-  document.getElementById("risk-badge").className    = "hbadge r"+rL;
-  document.getElementById("fwi-badge").className     = "hbadge r"+rL;
-  buildFWI(d); buildRCards(fwiMax); buildChips(d); buildLegend(); updateImg();
-}
-
-function buildFWI(d){
-  if(!d||!d.fwi_timeseries){
-    document.getElementById("fwi-rows").innerHTML='<div style="font-size:.63rem;color:var(--muted)">Données non disponibles</div>';
-    return;
-  }
-  var ts=d.fwi_timeseries, keys=Object.keys(ts).map(Number).sort(function(a,b){return a-b;});
-  var pick=keys.includes(12)?12:keys[Math.floor(keys.length/2)];
-  var v=ts[pick]||{};
-  var items=[
-    {n:"FFMC",desc:"Teneur litière", v:+(v.ffmc||0),max:101, c:"#ff9944"},
-    {n:"DMC", desc:"Org. moyenne",   v:+(v.dmc||0), max:150, c:"#ffcc00"},
-    {n:"DC",  desc:"Sécheresse",     v:+(v.dc||0),  max:800, c:"#ff6644"},
-    {n:"ISI", desc:"Propagation",    v:+(v.isi||0), max:25,  c:"#ff4444"},
-    {n:"BUI", desc:"Combustible",    v:+(v.bui||0), max:200, c:"#ff8833"},
-    {n:"FWI", desc:"Risque global",  v:+(v.fwi||0), max:50,  c:"#ff2222"},
-  ];
-  document.getElementById("fwi-rows").innerHTML=items.map(function(f){
-    var pct=Math.min(100,Math.round(f.v/f.max*100));
-    return '<div class="frow"><div class="frt"><span class="fn">'+f.n+'</span><span class="fv" style="color:'+f.c+'">'+f.v.toFixed(f.n==="ISI"?2:1)+'</span></div><div class="fd">'+f.desc+' · +'+String(pick).padStart(2,"0")+'h</div><div class="fb"><div class="ff" style="width:'+pct+'%;background:'+f.c+'"></div></div></div>';
-  }).join("");
-}
-
-function buildRCards(base){
-  var zones=ZONES.map(function(z){
-    var fwi=Math.round(base*z.k*10)/10;
-    var r=fwi>38?"E":fwi>24?"H":fwi>12?"M":"L";
-    return {n:z.n,fwi:fwi,r:r};
-  }).sort(function(a,b){return b.fwi-a.fwi;});
-  document.getElementById("rcards").innerHTML=zones.map(function(z){
-    var pct=Math.min(100,Math.round(z.fwi/50*100));
-    return '<div class="rcard"><div class="rct"><span class="rcn">'+z.n+'</span><span class="rpill r'+z.r+'">'+RLBL[z.r]+'</span></div><div class="rbg"><div class="rbar" style="width:'+pct+'%;background:'+RCOL[z.r]+'"></div></div><div class="rval">FWI estimé : <b style="color:'+RCOL[z.r]+'">'+z.fwi+'</b></div></div>';
-  }).join("");
-}
-
-function buildChips(d){
-  var html="";
-  if(d&&d.fwi_timeseries){
-    var ts=d.fwi_timeseries, keys=Object.keys(ts).map(Number).sort(function(a,b){return a-b;});
-    var peak=keys.reduce(function(best,k){return +(ts[k].fwi||0)>+(ts[best].fwi||0)?k:best;},keys[0]);
-    html='<div class="fchip"><span>Pic FWI :</span> <b>+'+String(peak).padStart(2,"0")+'h</b></div><div class="fchip"><span>Éch. :</span> <b>'+(maxFH+1)+'</b></div>';
-  }
-  document.getElementById("fchips").innerHTML=html;
-}
-
-function buildLegend(){
-  var lg=LEGENDS[curParam]||LEGENDS.t2m;
-  document.getElementById("legend").innerHTML='<h4>'+lg.t+'</h4>'+lg.s.map(function(s){return '<div class="li"><div class="lsw" style="background:'+s.c+'"></div><span>'+s.v+'</span></div>';}).join("");
-}
-
-function updateImg(){
-  var fhStr=String(curFH).padStart(3,"0");
-  var src="plots/"+curRun+"/"+curParam+"_F"+fhStr+".png";
-  document.getElementById("img-ph").style.display="flex";
-  document.getElementById("img-ph").innerHTML='<div class="spin">⟳</div><span>Chargement...</span>';
-  var img=document.getElementById("wrf-img");
-  img.classList.remove("ready");
-  img.src=src;
-  document.getElementById("mtitle").textContent=(PLBL[curParam]||curParam)+"  ·  +"+fhStr+"h";
-  document.getElementById("minfo").innerHTML="Run : <b>"+fmtRun(curRun)+"</b><br>Échéance : <b>+"+fhStr+"h</b>";
-  document.getElementById("fh-label").textContent="+"+fhStr+"h";
-  document.getElementById("st-fh").textContent="+"+fhStr+"h";
-  document.getElementById("st-par").textContent=PSHT[curParam]||curParam;
-}
-
-function onImgLoad(){
-  document.getElementById("img-ph").style.display="none";
-  document.getElementById("wrf-img").classList.add("ready");
-}
-function onImgErr(){
-  var fhStr=String(curFH).padStart(3,"0");
-  document.getElementById("img-ph").innerHTML='<div style="font-size:1.4rem">⚠️</div><span>'+curParam+'_F'+fhStr+'.png non disponible</span>';
-  document.getElementById("img-ph").style.display="flex";
-  document.getElementById("wrf-img").classList.remove("ready");
-}
-
-function selParam(id){
-  curParam=id;
-  document.querySelectorAll(".pbtn").forEach(function(b){b.classList.remove("on");});
-  var b=document.getElementById("pb-"+id);
-  if(b) b.classList.add("on");
-  updateImg(); buildLegend();
-}
-
-function seekFH(v){ stopPlay(); curFH=v; updateImg(); }
-
-function togglePlay(){
-  playing=!playing;
-  document.getElementById("pbtn").textContent=playing?"⏹ Stop":"▶ Animer";
-  if(playing){
-    playTimer=setInterval(function(){
-      curFH=(curFH+1)%(maxFH+1);
-      document.getElementById("fh-slider").value=curFH;
-      updateImg();
-    },800);
-  } else { clearInterval(playTimer); }
-}
-function stopPlay(){
-  if(!playing) return;
-  playing=false; clearInterval(playTimer);
-  document.getElementById("pbtn").textContent="▶ Animer";
-}
-</script>
+        // دالة افتراضية لبناء الخريطة بعد تخطي شاشة الدخول
+        function initMap() {
+            console.log("[Pyroguard] Initialisation de la carte Leaflet...");
+            // مثال لإعداد الخريطة على إحداثيات قسنطينة/الجزائر كمثال افتراضي للتحقق
+            const map = L.map('map').setView([36.365, 6.614], 8);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+            console.log("[Pyroguard] Carte Leaflet chargée avec succès. Simulations disponibles:", AVAILABLE_RUNS);
+        }
+    </script>
 </body>
-</html>'''
-
-html = html.replace('__LOGO__', logo_uri)
-
-with open('/home/claude/dashboard_template.html', 'w') as f:
-    f.write(html)
-print("Done:", len(html), "bytes,", html.count('\n'), "lines")
-PYEOF
-
+</html>
