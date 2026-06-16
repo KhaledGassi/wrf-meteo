@@ -3,14 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ForestPyroGuard AI — Interactif</title>
+<title>ForestPyroGuard AI — Cartographie Interactive</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root{--bg:#080c08;--bg2:#0e140e;--bg3:#161e16;--bdr:rgba(255,255,255,0.07);--bdr2:rgba(255,255,255,0.14);--txt:#cce0cc;--dim:#4a6a4a;--dim2:#6a8a6a;--or:#e06a18;--or2:rgba(224,106,24,0.18);--cy:#40c8c8}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--txt)}
-#splash{position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at 50% 40%,#0c1c0c 0%,#050805 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto;transition:opacity .7s}
+
+/* SPLASH SCREEN ACCUEIL */
+#splash{position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at 50% 40%,#0c1c0c 0%,#050805 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;transition:opacity .5s}
 #splash.hide{opacity:0;pointer-events:none}
 .sp-card{background:var(--bg2);border:1px solid var(--bdr2);border-radius:12px;padding:35px;max-width:500px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.5)}
 .sp-title{font-size:1.8rem;font-weight:700;color:var(--or);letter-spacing:1px;margin-bottom:5px}
@@ -20,42 +22,66 @@ html,body{height:100%;overflow:hidden;font-family:"Segoe UI",system-ui,sans-seri
 .sp-stat-lbl{font-size:.75rem;color:var(--dim2);text-transform:uppercase;margin-bottom:4px}
 .sp-stat-val{font-size:1.3rem;font-weight:bold;color:var(--txt)}
 .sp-btn{background:var(--or);color:#000;border:none;padding:12px 30px;font-size:1rem;font-weight:bold;border-radius:6px;cursor:pointer;transition:all .2s;width:100%}
-.sp-btn:hover{background:#f07a28;transform:scale(1.02)}
-#app{display:grid;grid-template-columns:280px 1fr;height:100%}
+.sp-btn:hover{background:#f07a28}
+
+/* INTERFACE PRINCIPALE */
+#app{display:grid;grid-template-columns:290px 1fr;height:100%}
 #side{background:var(--bg2);border-right:1px solid var(--bdr);display:flex;flex-direction:column;overflow-y:auto}
 .p-hdr{padding:20px;border-bottom:1px solid var(--bdr)}
 .p-logo{font-size:1.25rem;font-weight:bold;color:var(--or);letter-spacing:0.5px;display:flex;align-items:center;gap:8px}
-.p-ver{font-size:.7rem;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--dim2);font-weight:normal}
+.p-ver{font-size:.7rem;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--dim2)}
 .p-run{font-size:.8rem;color:var(--dim2);margin-top:5px}
 .p-sect{padding:15px 20px 5px 20px;font-size:.75rem;color:var(--dim2);text-transform:uppercase;letter-spacing:1px;font-weight:bold}
 .p-list{padding:0 10px;display:flex;flex-direction:column;gap:4px}
-.pb{display:flex;align-items:center;gap:10px;padding:10px 12px;background:transparent;border:none;color:var(--dim2);text-align:left;font-size:.9rem;border-radius:6px;cursor:pointer;transition:all .15s;width:100%}
+.pb{display:flex;align-items:center;gap:10px;padding:12px 14px;background:transparent;border:none;color:var(--dim2);text-align:left;font-size:.9rem;border-radius:6px;cursor:pointer;transition:all .15s;width:100%}
 .pb:hover{background:var(--bg3);color:var(--txt)}
 .pb.on{background:var(--or2);color:var(--or);font-weight:600}
 .pb-icon{font-size:1.1rem;width:20px;text-align:center}
+
+/* PANNEAU INFOS TEMPS RÉEL (Passage curseur) */
+#live-hud {
+  margin: 15px 15px 5px 15px;
+  background: var(--bg3);
+  border: 1px solid var(--bdr2);
+  border-radius: 8px;
+  padding: 12px;
+}
+.hud-title { font-size: 0.7rem; color: var(--or); text-transform: uppercase; font-weight: bold; margin-bottom: 8px; letter-spacing: 0.5px; }
+.hud-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px; color: var(--dim2); }
+.hud-val { color: var(--txt); font-weight: bold; font-family: monospace; }
+
 #main{display:flex;flex-direction:column;height:100%;position:relative}
-#top{height:60px;background:var(--bg2);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:between;padding:0 25px}
+#top{height:60px;background:var(--bg2);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;padding:0 25px}
 #mttl{font-size:1.1rem;font-weight:600;color:var(--txt)}
-#view-container {flex:1;position:relative;background:#030503;}
-#wimg{width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .2s}
-#wimg.ready{opacity:1}
-#map-container {position:absolute;inset:0;visibility:hidden;z-index:10;}
-#map {width:100%;height:100%;background:#050805;}
-#mph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--bg);color:var(--dim2);font-size:.9rem}
-.spin{animation:spin 1s linear infinite}
+
+/* ZONE CARTE INTERACTIVE UNIQUE */
+#view-container {flex:1;position:relative;background:#050805;}
+#map {width:100%;height:100%;background:#060a06;}
+
+/* CHARGEMENT */
+#mph{position:absolute;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(8,12,8,0.9);color:var(--dim2);font-size:.9rem}
+.spin{animation:spin 1s linear infinite;font-size:1.8rem;color:var(--or);margin-bottom:5px}
 @keyframes spin{100%{transform:rotate(360deg)}}
-#bot{background:var(--bg2);border-top:1px solid var(--bdr);padding:15px 25px;display:flex;align-items:center;gap:20px}
-.ctrl-btn{background:var(--bg3);border:1px solid var(--bdr2);color:var(--txt);padding:8px 16px;border-radius:6px;font-size:.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .15s}
+
+/* CONTROLES DU BAS & ECHELLE HORIZONTALE */
+#bot{background:var(--bg2);border-top:1px solid var(--bdr);padding:15px 25px;display:flex;flex-direction:column;gap:12px}
+.bot-top-row { display: flex; align-items: center; gap: 20px; }
+.ctrl-btn{background:var(--bg3);border:1px solid var(--bdr2);color:var(--txt);padding:10px 18px;border-radius:6px;font-size:.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .15s;min-width:110px;justify-content:center}
 .ctrl-btn:hover{background:var(--bdr2)}
 .slider-box{flex:1;display:flex;align-items:center;gap:15px;background:var(--bg3);padding:6px 15px;border-radius:6px;border:1px solid var(--bdr)}
 .slider-box span{font-size:.8rem;color:var(--dim2);font-family:monospace}
 #sld{flex:1;accent-color:var(--or);cursor:pointer;height:4px}
-#lgd{padding:15px 20px;margin-top:auto;border-top:1px solid var(--bdr);background:rgba(0,0,0,0.1)}
-.lgd-t{font-size:.75rem;color:var(--dim2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;font-weight:bold}
-.lgd-i{display:flex;align-items:center;gap:10px;font-size:.8rem;color:var(--dim2);margin-bottom:4px}
-.lgd-c{width:12px;height:12px;border-radius:3px;flex-shrink:0}
-/* Leaflet custom popup fixes */
-.leaflet-popup-content-wrapper { background: var(--bg2) !important; color: var(--txt) !important; border: 1px solid var(--bdr2); }
+
+/* ÉCHELLE HORIZONTALE EN BAS */
+#legend-bar-container { background: var(--bg3); border: 1px solid var(--bdr); padding: 10px 15px; border-radius: 6px; }
+.leg-title { font-size: 0.75rem; color: var(--dim2); text-transform: uppercase; font-weight: bold; margin-bottom: 6px; letter-spacing: 0.5px; }
+.leg-flex { display: flex; width: 100%; height: 14px; border-radius: 3px; overflow: hidden; border: 1px solid rgba(0,0,0,0.5); }
+.leg-block { flex: 1; height: 100%; text-align: center; font-size: 0.68rem; color: #000; font-weight: bold; display: flex; align-items: center; justify-content: center; text-shadow: 0 0 2px rgba(255,255,255,0.6); }
+.leg-labels { display: flex; justify-content: space-between; width: 100%; margin-top: 4px; padding: 0 4px; }
+.leg-lbl { font-size: 0.7rem; color: var(--dim2); font-family: monospace; }
+
+/* FIXES POPUP LEAFLET */
+.leaflet-popup-content-wrapper { background: var(--bg2) !important; color: var(--txt) !important; border: 1px solid var(--bdr2); border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
 .leaflet-popup-tip { background: var(--bg2) !important; }
 </style>
 </head>
@@ -64,74 +90,76 @@ html,body{height:100%;overflow:hidden;font-family:"Segoe UI",system-ui,sans-seri
 <div id="splash">
   <div class="sp-card">
     <div class="sp-title">ForestPyroGuard AI</div>
-    <div class="sp-sub">Calcul de Risques d'Incendies · Algérie</div>
+    <div class="sp-sub">Analyseur de Risques d'Incendies Interactif</div>
     <div class="sp-stats">
       <div class="sp-stat"><div class="sp-stat-lbl">Indice FWI Max</div><div class="sp-stat-val" id="stfwi">__FWI_MAX__</div></div>
-      <div class="sp-stat"><div class="sp-stat-lbl">Niveau de Risque</div><div class="sp-stat-val" id="strsk" style="color:var(--or)">__RISK__</div></div>
+      <div class="sp-stat"><div class="sp-stat-lbl">Niveau Global</div><div class="sp-stat-val" id="strsk" style="color:var(--or)">__RISK__</div></div>
     </div>
     <div style="margin-bottom:25px;text-align:left;background:var(--bg3);padding:15px;border-radius:8px;border:1px solid var(--bdr)">
-      <div class="lgd-i"><span style="color:var(--dim2)">Run d'analyse :</span><span style="color:var(--cy);font-weight:bold;margin-left:auto" id="strun">2026061600Z</span></div>
-      <div class="lgd-i"><span style="color:var(--dim2)">Échéance max :</span><span style="color:var(--txt);margin-left:auto" id="stfh">+24h</span></div>
-      <div class="lgd-i"><span style="color:var(--dim2)">Résolution :</span><span style="color:var(--txt);margin-left:auto">WRF 15 km</span></div>
+      <div class="hud-row"><span>Modèle Météo :</span><span class="hud-val" style="color:var(--cy)">WRF Algérie 15km</span></div>
+      <div class="hud-row"><span>Dernier Run GFS :</span><span class="hud-val" id="strun">2026061600Z</span></div>
     </div>
-    <button class="sp-btn" onclick="closeSplash()">ACCÉDER AU TABLEAU DE BORD</button>
+    <button class="sp-btn" onclick="closeSplash()">INITIALISER LA CARTE DYNAMIQUE</button>
   </div>
 </div>
 
 <div id="app">
   <div id="side">
     <div class="p-hdr">
-      <div class="p-logo">⚔️ PyroGuard <span class="p-ver">v5.0</span></div>
-      <div class="p-run">Run: <span id="run-lbl" style="color:var(--cy)">2026061600Z</span></div>
+      <div class="p-logo">⚔️ PyroGuard AI <span class="p-ver">v5.2</span></div>
+      <div class="p-run">Run actif : <span id="run-lbl" style="color:var(--cy)">2026061600Z</span></div>
     </div>
     
-    <div class="p-sect">Sélecteur de Run</div>
+    <div class="p-sect">Choisir l'échéance du Run</div>
     <div style="padding:0 20px 10px 20px;">
-      <select id="run-select" onchange="switchRun(this.value)" style="width:100%; background:var(--bg3); color:var(--txt); border:1px solid var(--bdr2); padding:6px; border-radius:4px; outline:none;"></select>
+      <select id="run-select" onchange="switchRun(this.value)" style="width:100%; background:var(--bg3); color:var(--txt); border:1px solid var(--bdr2); padding:8px; border-radius:4px; outline:none; cursor:pointer; font-size:0.85rem;"></select>
     </div>
 
-    <div class="p-sect">Variables WRF / FWI</div>
+    <div class="p-sect">Variables à cartographier</div>
     <div class="p-list">
       <button class="pb on" id="pb-fwi" onclick="sp('fwi')"><span class="pb-icon">🔥</span> FWI Fire Index</button>
       <button class="pb" id="pb-t2m" onclick="sp('t2m')"><span class="pb-icon">🌡️</span> Température 2m</button>
-      <button class="pb" id="pb-wind" onclick="sp('wind')"><span class="pb-icon">💨</span> Vent 10m</button>
-      <button class="pb" id="pb-rh" onclick="sp('rh')"><span class="pb-icon">💧</span> Humidité Rel.</button>
-      <button class="pb" id="pb-prec" onclick="sp('prec')"><span class="pb-icon">🌧️</span> Précipitations</button>
-      <button class="pb" id="pb-mslp" onclick="sp('mslp')"><span class="pb-icon">🌀</span> MSLP + Z500</button>
+      <button class="pb" id="pb-wind" onclick="sp('wind')"><span class="pb-icon">💨</span> Vent à 10m</button>
+      <button class="pb" id="pb-rh" onclick="sp('rh')"><span class="pb-icon">💧</span> Humidité Relative</button>
     </div>
 
-    <div class="p-sect">Mode d'affichage</div>
-    <div style="padding:0 20px 15px 20px;">
-      <button class="ctrl-btn" id="toggle-mode-btn" onclick="toggleDisplayMode()" style="width:100%; justify-content:center; border-color:var(--or); color:var(--or);">
-        🌐 Activer Mode Interactif
-      </button>
+    <div id="live-hud">
+      <div class="hud-title">🔍 Zone survolée (Données WRF)</div>
+      <div class="hud-row"><span>Latitude :</span><span class="hud-val" id="hud-lat">-</span></div>
+      <div class="hud-row"><span>Longitude :</span><span class="hud-val" id="hud-lon">-</span></div>
+      <hr style="border:0; border-top:1px solid var(--bdr); margin:6px 0;">
+      <div class="hud-row"><span style="color:var(--or)">Indice FWI :</span><span class="hud-val" id="hud-fwi" style="color:var(--or)">-</span></div>
+      <div class="hud-row"><span>Température :</span><span class="hud-val" id="hud-t2m">-</span></div>
+      <div class="hud-row"><span>Vitesse Vent :</span><span class="hud-val" id="hud-wind">-</span></div>
+      <div class="hud-row"><span>Humidité :</span><span class="hud-val" id="hud-rh">-</span></div>
     </div>
-
-    <div id="lgd"></div>
   </div>
 
   <div id="main">
     <div id="top">
-      <div id="mttl">FWI Fire Index   ·   +00h</div>
-      <div style="font-size:.8rem;color:var(--dim2);font-family:monospace">SÉCURITÉ CIVILE ALGÉRIE</div>
+      <div id="mttl">FWI Fire Index   ·   Échéance +00h</div>
+      <div style="font-size:.8rem;color:var(--dim2);font-family:monospace;letter-spacing:1px">SÉCURITÉ CIVILE ALGÉRIE</div>
     </div>
 
     <div id="view-container">
-      <img id="wimg" src="" onload="imgOK()" onerror="imgERR()" />
-      
-      <div id="map-container">
-        <div id="map"></div>
-      </div>
-
-      <div id="mph"><div class="spin" style="font-size:1.5rem;color:var(--or)">⟳</div><span>Chargement des matrices...</span></div>
+      <div id="map"></div>
+      <div id="mph"><div class="spin">⟳</div><span>Interpolation continue des champs scalaires...</span></div>
     </div>
 
     <div id="bot">
-      <button class="ctrl-btn" id="pbtn" onclick="togglePlay()">▶ Animer</button>
-      <div class="slider-box">
-        <span>+00h</span>
-        <input type="range" id="sld" min="0" max="24" value="0" step="1" oninput="seekFH(this.value)" />
-        <span id="fhl">+00h</span>
+      <div class="bot-top-row">
+        <button class="ctrl-btn" id="pbtn" onclick="togglePlay()">▶ Animer</button>
+        <div class="slider-box">
+          <span>+00h</span>
+          <input type="range" id="sld" min="0" max="23" value="0" step="1" oninput="seekFH(this.value)" />
+          <span id="fhl">+23h</span>
+        </div>
+      </div>
+
+      <div id="legend-bar-container">
+        <div class="leg-title" id="leg-title-text">Échelle</div>
+        <div class="leg-flex" id="leg-colors"></div>
+        <div class="leg-labels" id="leg-labels"></div>
       </div>
     </div>
   </div>
@@ -142,26 +170,34 @@ var RUNS = ["20260616_00Z","20260526_00Z","20260522_00Z"];
 var curRun = "2026061600Z";
 var curParam = "fwi";
 var curFH = 0;
-var maxFH = 24;
+var maxFH = 23;
 var playing = false;
 var pt = null;
-var interactiveMode = false;
 
-// Variables Leaflet
 var map = null;
-var geoGridLayer = null;
+var gridLayer = null; // Contiendra nos polygones de grille collés
 var wrfJsonData = {}; 
 
-var PLBL={fwi:"FWI Fire Index",t2m:"Température 2m",wind:"Vent 10m",rh:"Humidité Rel.",prec:"Précipitations",mslp:"MSLP + Z500"};
-var PSHT={fwi:"FWI",t2m:"T2M",wind:"WIND",rh:"RH",prec:"PREC",mslp:"MSLP"};
+var PLBL={fwi:"FWI Fire Index",t2m:"Température à 2m",wind:"Vitesse du vent à 10m",rh:"Humidité Relative"};
 
-var LGD={
-  fwi:[{c:"#1a9850",t:"< 5 Faible"},{c:"#a6d96a",t:"5 - 12 Modéré"},{c:"#ffffbf",t:"12 - 24 Élevé"},{c:"#fdae61",t:"24 - 38 Très Élevé"},{c:"#a50026",t:"> 38 Extrême"}],
-  t2m:[{c:"#2166ac",t:"< 15°C Frais"},{c:"#92c5de",t:"15 - 25°C"},{c:"#fddbc7",t:"25 - 35°C Chaud"},{c:"#d6604d",t:"35 - 42°C"},{c:"#67001f",t:"> 42°C Canicule"}],
-  wind:[{c:"#ffffcc",t:"< 15 km/h Calme"},{c:"#41b6c4",t:"15 - 30 km/h"},{c:"#2c7fb8",t:"30 - 50 km/h Modéré"},{c:"#54278f",t:"> 50 km/h Fort"}],
-  rh:[{c:"#a50026",t:"< 20% Très Sec"},{c:"#fdae61",t:"20 - 40% Sec"},{c:"#a6d96a",t:"40 - 70% Moyen"},{c:"#006837",t:"> 70% Humide"}],
-  prec:[{c:"#ffffff",t:"0 mm Aucun"},{c:"#63be7b",t:"0.1 - 5 mm"},{c:"#0000ff",t:"5 - 20 mm Pluie"},{c:"#800080",t:"> 20 mm Forte"}],
-  mslp:[{c:"#2166ac",t:"< 1010 hPa Dépression"},{c:"#f7f7f7",t:"1013 hPa Marais"},{c:"#b2182b",t:"> 1016 hPa Anticyclone"}]
+// Définition des échelles de couleur absolues continues
+var LGD_CONFIG = {
+  fwi: {
+    title: "Intensité du risque (Indice FWI)",
+    steps: [{v:0,c:"#2ca25f",t:"Faible"},{v:5,c:"#99d8c9",t:"Modéré"},{v:12,c:"#fecc5c",t:"Élevé"},{v:24,c:"#fd8d3c",t:"Très Élevé"},{v:38,c:"#e31a1c",t:"Extrême"}]
+  },
+  t2m: {
+    title: "Température de l'air (°C)",
+    steps: [{v:10,c:"#3182bd",t:"Frais"},{v:20,c:"#9ecae1",t:"Doux"},{v:30,c:"#fe9929",t:"Chaud"},{v:38,c:"#ec7014",t:"Très Chaud"},{v:44,c:"#bd0026",t:"Canicule"}]
+  },
+  wind: {
+    title: "Vitesse du Vent (km/h)",
+    steps: [{v:0,c:"#edf8b1",t:"Calme"},{v:15,c:"#7fcdbb",t:"Modéré"},{v:30,c:"#41b6c4",t:"Soutenu"},{v:45,c:"#1d91c0",t:"Fort"},{v:60,c:"#081d58",t:"Violent"}]
+  },
+  rh: {
+    title: "Humidité relative de l'air (%)",
+    steps: [{v:10,c:"#800026",t:"Critique Sec"},{v:25,c:"#feb24c",t:"Sec"},{v:45,c:"#fed976",t:"Moyen"},{v:65,c:"#a1dab4",t:"Humide"},{v:85,c:"#41b6c4",t:"Très Humide"}]
+  }
 };
 
 function initRunSelect(){
@@ -179,186 +215,144 @@ function switchRun(r){
   stopPlay();
   curRun=r;
   document.getElementById("run-lbl").textContent=r;
-  
-  // Si on est en mode interactif, charger le nouveau JSON de ce run
-  if(interactiveMode) {
-    loadInteractiveJson();
-  } else {
-    updImg();
-  }
+  loadWrfJson();
 }
 
 function closeSplash(){document.getElementById("splash").classList.add("hide");}
 
-function buildLgd(){
-  var h=document.getElementById("lgd");
-  var arr=LGD[curParam]||[];
-  var html='<div class="lgd-t">LÉGENDE SEUIL</div>';
-  arr.forEach(function(i){
-    html+='<div class="lgd-i"><div class="lgd-c" style="background:'+i.c+'"></div><span>'+i.t+'</span></div>';
-  });
-  h.innerHTML=html;
-}
-
-function toggleDisplayMode() {
-  stopPlay();
-  interactiveMode = !interactiveMode;
-  var btn = document.getElementById("toggle-mode-btn");
-  var img = document.getElementById("wimg");
-  var mapCont = document.getElementById("map-container");
-
-  if(interactiveMode) {
-    btn.innerHTML = "🖼️ Activer Mode Images (Fixe)";
-    btn.style.borderColor = "var(--cy)";
-    btn.style.color = "var(--cy)";
-    img.style.display = "none";
-    mapCont.style.visibility = "visible";
-    
-    if(!map) initLeafletMap();
-    loadInteractiveJson();
-  } else {
-    btn.innerHTML = "🌐 Activer Mode Interactif";
-    btn.style.borderColor = "var(--or)";
-    btn.style.color = "var(--or)";
-    mapCont.style.visibility = "hidden";
-    img.style.display = "block";
-    updImg();
+// Donne une couleur lissée basée sur les seuils configurés
+function getColorForValue(val, param) {
+  var cfg = LGD_CONFIG[param];
+  if(!cfg) return "#40c8c8";
+  var color = cfg.steps[0].c;
+  for(var i=0; i<cfg.steps.length; i++) {
+    if(val >= cfg.steps[i].v) {
+      color = cfg.steps[i].c;
+    } else {
+      break;
+    }
   }
+  return color;
 }
 
-function initLeafletMap() {
-  map = L.map('map').setView([36.2, 3.2], 7);
+// Dessiner l'échelle horizontale fixe en bas en fonction du paramètre choisi
+function updateBottomLegendBar() {
+  var cfg = LGD_CONFIG[curParam];
+  document.getElementById("leg-title-text").textContent = cfg.title;
+  
+  var colorsDiv = document.getElementById("leg-colors");
+  var labelsDiv = document.getElementById("leg-labels");
+  colorsDiv.innerHTML = "";
+  labelsDiv.innerHTML = "";
+  
+  cfg.steps.forEach(function(step, index) {
+    // Bloc couleur
+    var block = document.createElement("div");
+    block.className = "leg-block";
+    block.style.background = step.c;
+    block.textContent = step.v + (curParam==="t2m"?"°C":curParam==="wind"?" km/h":curParam==="rh"?"%":"");
+    colorsDiv.appendChild(block);
+    
+    // Label qualitatif
+    var lbl = document.createElement("div");
+    lbl.className = "leg-lbl";
+    lbl.textContent = step.t;
+    labelsDiv.appendChild(lbl);
+  });
+}
+
+function initMap() {
+  // Fond de carte sombre minimaliste pour faire ressortir les couleurs du WRF
+  map = L.map('map', {zoomControl: true}).setView([34.5, 3.5], 6);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap contributors &copy; CARTO'
+    attribution: '© OpenStreetMap | ForestPyroGuard AI'
   }).addTo(map);
 }
 
-function loadInteractiveJson() {
+function loadWrfJson() {
   document.getElementById("mph").style.display = "flex";
   fetch('plots/' + curRun + '/hourly_data.json')
     .then(res => {
-      if(!res.ok) throw new Error("JSON absent");
+      if(!res.ok) throw new Error("Fichier matriciel manquant");
       return res.json();
     })
     .then(data => {
       wrfJsonData = data;
       document.getElementById("mph").style.display = "none";
-      renderInteractiveLayer();
+      renderContinuousGrid();
     })
     .catch(err => {
-      document.getElementById("mph").innerHTML = '⚠️ Erreur d\'acquisition de la matrice interactive.';
+      document.getElementById("mph").innerHTML = '⚠️ Erreur d\'acquisition ou matrice horaire introuvable pour ce run.';
     });
 }
 
-function getParamIdx(param) {
+function getParamIndex(param) {
   if (param === "t2m") return 2;
   if (param === "wind") return 3;
   if (param === "rh") return 4;
-  if (param === "fwi") return 5;
   return 5; // FWI par défaut
 }
 
-function getWebColor(val, param) {
-  var list = LGD[param] || [];
-  if(param === "fwi") {
-    if(val >= 38) return '#a50026'; if(val >= 24) return '#fdae61';
-    if(val >= 12) return '#ffffbf'; if(val >= 5) return '#a6d96a'; return '#1a9850';
-  }
-  if(param === "t2m") {
-    if(val > 42) return '#67001f'; if(val > 35) return '#d6604d';
-    if(val > 25) return '#fddbc7'; if(val > 15) return '#92c5de'; return '#2166ac';
-  }
-  if(param === "wind") {
-    if(val > 50) return '#54278f'; if(val > 30) return '#2c7fb8';
-    if(val > 15) return '#41b6c4'; return '#ffffcc';
-  }
-  if(param === "rh") {
-    if(val < 20) return '#a50026'; if(val < 40) return '#fdae61';
-    if(val < 70) return '#a6d96a'; return '#006837';
-  }
-  return '#40c8c8';
-}
-
-function renderInteractiveLayer() {
+// Génère une cartographie continue sans "trous" ni points isolés en utilisant des cellules jointives
+function renderContinuousGrid() {
   if(!map || !wrfJsonData[curFH]) return;
-  if(geoGridLayer) map.removeLayer(geoGridLayer);
+  if(gridLayer) map.removeLayer(gridLayer);
 
   var points = wrfJsonData[curFH];
-  var idx = getParamIdx(curParam);
-  var markers = [];
+  var idx = getParamIndex(curParam);
+  var polygons = [];
+  
+  // Estimation de la taille d'une maille WRF (15km ~ 0.135 degré de latitude/longitude)
+  var cellSize = 0.135; 
+  var half = cellSize / 2;
 
-  // Mise à jour du titre textuel haut
-  var fhS = String(curFH).padStart(3, "0");
-  document.getElementById("mttl").textContent = (PLBL[curParam]||curParam) + " (Interactif)  ·  +" + fhS + "h";
-
-  // Ne pas tenter d'afficher des données vectorielles complexes pour le MSLP pur (garder l'image ou notification)
-  if(curParam === "mslp" || curParam === "prec") {
-    document.getElementById("mph").innerHTML = 'ℹ️ Utilisez le mode image pour consulter les lignes de champ MSLP / Précipitations cumulées.';
-    document.getElementById("mph").style.display = "flex";
-    return;
-  } else {
-    document.getElementById("mph").style.display = "none";
-  }
+  var fhS = String(curFH).padStart(2, "0");
+  document.getElementById("mttl").textContent = PLBL[curParam] + "   ·   Échéance +" + fhS + "h";
 
   points.forEach(function(p) {
-    var lat = p[0], lon = p[1], val = p[idx];
+    var lat = p[0];
+    var lon = p[1];
+    var val = p[idx];
     
-    var m = L.circleMarker([lat, lon], {
-      radius: 5,
-      fillColor: getWebColor(val, curParam),
-      color: '#000',
-      weight: 0.2,
-      fillOpacity: 0.8
+    // Bornes de la cellule pour créer un affichage de carte plein et collé
+    var bounds = [
+      [lat - half, lon - half],
+      [lat + half, lon - half],
+      [lat + half, lon + half],
+      [lat - half, lon + half]
+    ];
+
+    var cellColor = getColorForValue(val, curParam);
+
+    var poly = L.polygon(bounds, {
+      fillColor: cellColor,
+      fillOpacity: 0.75,
+      stroke: true,
+      color: cellColor,
+      weight: 0.3, // Jointure fine invisible ou presque pour coller les zones
     });
 
-    m.bindPopup(`
-      <div style="color:#fff; font-size:12px; min-width:140px;">
-        <b style="color:var(--or); font-size:14px;">Algérie Grille WRF</b><br><hr style="border:0;border-top:1px solid var(--bdr);margin:4px 0;">
-        🌡️ <b>Température :</b> ${p[2]} °C<br>
-        💨 <b>Vent :</b> ${p[3]} km/h<br>
-        💧 <b>Humidité :</b> ${p[4]} %<br>
-        🔥 <b>Indice FWI :</b> <span style="color:var(--cy)">${p[5]}</span>
-      </div>
-    `);
+    // Événement de survol instantané (HUD gauche + synchronisation)
+    poly.on('mouseover', function(e) {
+      poly.setStyle({ fillOpacity: 0.95, weight: 1, color: '#fff' });
+      
+      // Injection directe dans le panneau de lecture à gauche
+      document.getElementById("hud-lat").textContent = lat.toFixed(3) + "°N";
+      document.getElementById("hud-lon").textContent = lon.toFixed(3) + "°E";
+      document.getElementById("hud-t2m").textContent = p[2] + " °C";
+      document.getElementById("hud-wind").textContent = p[3] + " km/h";
+      document.getElementById("hud-rh").textContent = p[4] + " %";
+      document.getElementById("hud-fwi").textContent = p[5];
+    });
 
-    m.on('mouseover', function() { this.openPopup(); });
-    markers.push(m);
+    poly.on('mouseout', function() {
+      poly.setStyle({ fillOpacity: 0.75, weight: 0.3, color: cellColor });
+    });
+
+    polygons.push(poly);
   });
 
-  geoGridLayer = L.layerGroup(markers).addTo(map);
-}
-
-function updImg(){
-  if(interactiveMode) {
-    renderInteractiveLayer();
-    return;
-  }
-  document.getElementById("mph").innerHTML='<div class="spin" style="font-size:1.5rem;color:var(--or)">⟳</div><span>Chargement de la carte...</span>';
-  document.getElementById("mph").style.display="flex";
-  var fhS=String(curFH).padStart(3,"0");
-  var src="plots/"+curRun+"/"+curParam+"_F"+fhS+".png";
-  var img=document.getElementById("wimg");
-  img.classList.remove("ready");
-  img.src=src;
-  document.getElementById("mttl").textContent=(PLBL[curParam]||curParam)+"   ·   +"+fhS+"h";
-  document.getElementById("fhl").textContent="+"+fhS+"h";
-  document.getElementById("stfh").textContent="+"+fhS+"h";
-}
-
-function imgOK(){
-  if(!interactiveMode) {
-    document.getElementById("mph").style.display="none";
-    document.getElementById("wimg").classList.add("ready");
-  }
-}
-
-function imgERR(){
-  if(!interactiveMode) {
-    var fhS=String(curFH).padStart(3,"0");
-    document.getElementById("mph").innerHTML='<div style=\"font-size:1.3rem\">⚠️</div><span>'+curParam+'_F'+fhS+'.png non disponible</span>';
-    document.getElementById("mph").style.display="flex";
-    document.getElementById("wimg").classList.remove("ready");
-  }
+  gridLayer = L.layerGroup(polygons).addTo(map);
 }
 
 function sp(id){
@@ -366,15 +360,16 @@ function sp(id){
   document.querySelectorAll(".pb").forEach(function(b){b.classList.remove("on");});
   var b=document.getElementById("pb-"+id);
   if(b) b.classList.add("on");
-  updImg();
-  buildLgd();
+  
+  renderContinuousGrid();
+  updateBottomLegendBar();
 }
 
 function seekFH(v){
   stopPlay();
   curFH=parseInt(v);
   document.querySelectorAll(".slider-box span")[0].textContent = "+" + String(curFH).padStart(2, "0") + "h";
-  updImg();
+  renderContinuousGrid();
 }
 
 function togglePlay(){
@@ -385,8 +380,8 @@ function togglePlay(){
       curFH=(curFH+1)%(maxFH+1);
       document.getElementById("sld").value=curFH;
       document.querySelectorAll(".slider-box span")[0].textContent = "+" + String(curFH).padStart(2, "0") + "h";
-      updImg();
-    },800);
+      renderContinuousGrid();
+    },700);
   }else{
     clearInterval(pt);
   }
@@ -394,10 +389,11 @@ function togglePlay(){
 
 function stopPlay(){playing=false;clearInterval(pt);document.getElementById("pbtn").textContent="▶ Animer";}
 
-// Boot
+// Démarrage initial
 initRunSelect();
-buildLgd();
-updImg();
+initMap();
+updateBottomLegendBar();
+loadWrfJson();
 </script>
 </body>
 </html>
